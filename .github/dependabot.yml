@@ -1,0 +1,46 @@
+# Copiar en .github/dependabot.yml.
+#
+# Remediacion. Dependabot abre PR de actualizacion de seguridad agrupadas por
+# ecosistema, y el flujo sca-gate las vuelve a escanear; en modo diferencial el
+# comentario muestra que vulnerabilidades corrige cada PR.
+#
+# open-pull-requests-limit 0 desactiva las actualizaciones de version y deja
+# solo las de seguridad, que tienen su propio limite. Hay que activar
+# "Dependabot security updates" en Settings > Code security.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 0
+    groups:
+      seguridad-npm:
+        applies-to: security-updates
+        patterns: ["*"]
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 0
+    groups:
+      seguridad-pip:
+        applies-to: security-updates
+        patterns: ["*"]
+
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 0
+    groups:
+      seguridad-maven:
+        applies-to: security-updates
+        patterns: ["*"]
+
+  # Mantiene al dia los SHA con los que se fijan las acciones (incluida sca-gate)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

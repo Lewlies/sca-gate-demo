@@ -1,0 +1,69 @@
+# Copiar en .github/workflows/ del repositorio que se quiere proteger.
+# Sustituir 0462a81b1ca7a3b120c0cd3d46354e02d7f8655e por el commit de Lewlies/sca-gate que se haya revisado.
+#
+# Dos jobs con permisos separados.
+#   escanear  solo lectura; escanea la PR y la rama base (modo diferencial).
+#   comentar  escritura en PR; no descarga codigo de la PR, solo publica el informe.
+# Para que bloquee la fusion, marcar "sca-gate / escanear" como comprobacion
+# obligatoria en la proteccion de la rama.
+name: sca-gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions: {}
+
+concurrency:
+  group: sca-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  escanear:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Codigo de la PR
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: pr
+          persist-credentials: false
+
+      - name: Codigo de la rama base
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+
+      - name: sca-gate
+        uses: Lewlies/sca-gate@0462a81b1ca7a3b120c0cd3d46354e02d7f8655e # v1.0.0
+        with:
+          ruta: pr
+          ruta-base: base
+          # las excepciones se leen de la base; las que anada la PR solo se informan
+          excepciones: base/.sca-excepciones.toml
+          excepciones-propuestas: pr/.sca-excepciones.toml
+
+  comentar:
+    needs: escanear
+    # en PR desde forks el token es de solo lectura; el informe queda en el resumen del job
+    if: always() && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Informe del escaneo
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        continue-on-error: true
+        with:
+          name: sca-gate-informe
+          path: sca-gate-informe
+
+      - name: Comentario en la PR
+        uses: Lewlies/sca-gate/publicar@0462a81b1ca7a3b120c0cd3d46354e02d7f8655e # v1.0.0
+        with:
+          destino: pr

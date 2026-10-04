@@ -4,6 +4,7 @@
   "private": true,
   "description": "Proyecto minimo para demostrar sca-gate (TFG). Parte con lodash 4.17.20, vulnerable a CVE-2021-23337.",
   "dependencies": {
+    "jquery": "3.4.1",
     "lodash": "4.17.20"
   }
 }

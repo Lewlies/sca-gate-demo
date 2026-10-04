@@ -22,7 +22,7 @@ jobs:
           ref: ${{ github.event.pull_request.base.sha }}
           path: base
           persist-credentials: false
-      - uses: Lewlies/sca-gate@ce59986b3fe8bc4730f00bee8078456ee5ffb290
+      - uses: Lewlies/sca-gate@a931e977f4aa634c53f99d7cebe4d7e1d194978f
         with:
           ruta: pr
           ruta-base: base

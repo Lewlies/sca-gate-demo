@@ -26,7 +26,7 @@ jobs:
           key: dc-${{ github.run_id }}
           restore-keys: dc-
       - id: gate
-        uses: Lewlies/sca-gate@ce59986b3fe8bc4730f00bee8078456ee5ffb290
+        uses: Lewlies/sca-gate@a931e977f4aa634c53f99d7cebe4d7e1d194978f
         with:
           herramientas: trivy,osv-scanner,dependency-check
           nvd-api-key: ${{ secrets.NVD_API_KEY }}
